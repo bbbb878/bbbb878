@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>當日賭盤排行榜 · 2026/06/25</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<style>:root{
+  --bg:#0c0a13; --panel:#141019; --raised:#1b1626; --line:#2a2438;
+  --purple:#a970ff; --purple-deep:#6c3ff0;
+  --mint:#2ce4b8; --coral:#ff5d73; --gold:#ffcb52;
+  --silver:#cdd2dc; --bronze:#d98f54;
+  --text:#efedf5; --muted:#8f8aa3;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Noto Sans TC","Space Grotesk",system-ui,sans-serif;
+  line-height:1.45; -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(900px 420px at 50% -120px, rgba(108,63,240,.22), transparent 70%),
+    radial-gradient(600px 300px at 100% 0, rgba(44,228,184,.05), transparent 70%);
+}
+.num{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.gain{color:var(--mint)} .loss{color:var(--coral)}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 18px 60px}
+
+/* 頁首 */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.brand{display:flex;flex-direction:column;gap:6px}
+.kicker{display:flex;align-items:center;gap:8px;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.live{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 0 rgba(44,228,184,.6);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(44,228,184,.5)}70%{box-shadow:0 0 0 7px rgba(44,228,184,0)}100%{box-shadow:0 0 0 0 rgba(44,228,184,0)}}
+h1{margin:0;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:2rem;letter-spacing:-.02em}
+h1 .accent{color:var(--purple)}
+.datebox{text-align:right}
+.datebox .d{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.15rem}
+.datebox .u{font-size:.72rem;color:var(--muted);margin-top:2px}
+
+/* 統計 chips */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.chip .l{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.chip .v{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:1.5rem;margin-top:4px}
+
+/* 英雄對決 */
+.hero{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:14px;margin-bottom:30px}
+.hero-card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px 24px;overflow:hidden}
+.hero-card::before{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none}
+.hero-win::before{background:radial-gradient(120% 100% at 0 0,rgba(44,228,184,.16),transparent 55%)}
+.hero-loss::before{background:radial-gradient(120% 100% at 100% 0,rgba(255,93,115,.16),transparent 55%)}
+.hero-win{border-color:rgba(44,228,184,.35)} .hero-loss{border-color:rgba(255,93,115,.35)}
+.hero-loss{text-align:right}
+.hero-eyebrow{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:8px;position:relative}
+.hero-loss .hero-eyebrow{justify-content:flex-end}
+.hero-win .hero-eyebrow i{color:var(--gold)} .hero-loss .hero-eyebrow i{color:var(--coral)}
+.hero-name{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.5rem;margin:10px 0 6px;position:relative}
+.hero-figure{font-weight:800;font-size:2.6rem;line-height:1;letter-spacing:-.02em;position:relative}
+.hero-win .hero-figure{color:var(--mint);text-shadow:0 0 26px rgba(44,228,184,.35)}
+.hero-loss .hero-figure{color:var(--coral);text-shadow:0 0 26px rgba(255,93,115,.3)}
+.hero-meta{display:flex;gap:16px;margin-top:14px;font-size:.8rem;color:var(--muted);position:relative}
+.hero-loss .hero-meta{justify-content:flex-end}
+.hero-vs{display:flex;align-items:center;justify-content:center;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1rem;color:var(--muted);letter-spacing:.1em;min-width:34px}
+.hero-card.is-empty{display:flex;flex-direction:column;justify-content:center}
+.hero-empty{color:var(--muted);font-size:1rem;margin-top:10px}
+
+/* 排行榜卡 */
+.boards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.board{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.board.full{grid-column:1/-1}
+.board-head{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.board-head .ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.board-head h2{margin:0;font-family:"Space Grotesk",sans-serif;font-size:1.05rem;font-weight:700;flex:1}
+.board-head .count{font-family:"JetBrains Mono",monospace;font-size:.75rem;color:var(--muted)}
+.ico.win{background:rgba(44,228,184,.12);color:var(--mint)}
+.ico.loss{background:rgba(255,93,115,.12);color:var(--coral)}
+.ico.hot{background:rgba(169,112,255,.14);color:var(--purple)}
+
+.row{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid rgba(42,36,56,.6);
+  animation:rise .5s ease both;animation-delay:calc(var(--i,0)*45ms)}
+.row:last-child{border-bottom:none}
+.row:hover{background:var(--raised)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.rank{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:1.05rem;text-align:center;color:var(--muted)}
+.rank-1{color:var(--gold)} .rank-2{color:var(--silver)} .rank-3{color:var(--bronze)}
+.who .name{font-weight:700;font-size:.98rem;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.who .sub,.val .sub{font-size:.72rem;color:var(--muted);margin-top:2px}
+.val{text-align:right}
+.val .num{font-weight:800;font-size:1.05rem}
+.val .unit{font-size:.72rem;color:var(--muted);font-weight:500}
+.champ-ico{font-size:.78rem;color:var(--gold)}
+.row.is-champion{background:linear-gradient(90deg,rgba(169,112,255,.10),transparent 60%)}
+.board.win .row.is-champion{background:linear-gradient(90deg,rgba(44,228,184,.10),transparent 60%)}
+.board.loss .row.is-champion{background:linear-gradient(90deg,rgba(255,93,115,.10),transparent 60%)}
+.row.is-champion .rank{font-size:1.2rem}
+.medal{font-size:.62rem;font-weight:900;padding:2px 7px;border-radius:20px;color:#000}
+.medal-1{background:var(--gold)} .medal-2{background:var(--silver)} .medal-3{background:var(--bronze)}
+.empty{padding:34px 20px;text-align:center;color:var(--muted);font-size:.9rem}
+
+footer{margin-top:34px;text-align:center;color:var(--muted);font-size:.74rem;line-height:1.7}
+
+@media (max-width:760px){
+  h1{font-size:1.55rem}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .hero{grid-template-columns:1fr}
+  .hero-loss{text-align:left}
+  .hero-loss .hero-eyebrow,.hero-loss .hero-meta{justify-content:flex-start}
+  .hero-vs{display:none}
+  .boards{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  .row{animation:none}.live{animation:none}
+}</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="kicker"><span class="live"></span> Live · 每日重置</div>
+      <h1>當日<span class="accent">賭盤</span>排行榜</h1>
+    </div>
+    <div class="datebox">
+      <div class="d">2026/06/25 <span style="color:var(--muted);font-weight:500">週四</span></div>
+      <div class="u">更新於 14:47:08</div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="chip"><div class="l">參與玩家</div><div class="v">229</div></div>
+    <div class="chip"><div class="l">總注單</div><div class="v">2,284</div></div>
+    <div class="chip"><div class="l">總投入點數</div><div class="v">68,113,305</div></div>
+    <div class="chip"><div class="l">賭盤場次</div><div class="v">86</div></div>
+  </div>
+
+  <div class="hero">
+    <div class='hero-card hero-win'>
+              <div class='hero-eyebrow'><i class='fas fa-crown'></i> 今日最大贏家</div>
+              <div class='hero-name'>ggrewwq</div>
+              <div class='hero-figure num'>+1,414,980</div>
+              <div class='hero-meta'>
+                <span>73 注</span>
+                <span>勝率 49%</span>
+                <span>投入 8,271,000</span>
+              </div>
+            </div>
+    <div class="hero-vs">VS</div>
+    <div class='hero-card hero-loss'>
+              <div class='hero-eyebrow'><i class='fas fa-skull'></i> 今日最大輸家</div>
+              <div class='hero-name'>winniewinnie03</div>
+              <div class='hero-figure num'>-859,900</div>
+              <div class='hero-meta'>
+                <span>22 注</span>
+                <span>勝率 27%</span>
+                <span>投入 2,891,248</span>
+              </div>
+            </div>
+  </div>
+
+  <div class="boards">
+    <div class="board win">
+      <div class="board-head">
+        <div class="ico win"><i class="fas fa-arrow-trend-up"></i></div>
+        <h2>盈利排行</h2><span class="count">TOP 10</span>
+      </div>
+      <div class='row is-champion' style='--i:0'>
+                    <div class='rank rank-1'>1</div>
+                    <div class='who'>
+                      <div class='name'>ggrewwq <i class='fas fa-crown champ-ico'></i></div>
+                      <div class='sub'>73 注 · 勝率 49%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num gain'>+1,414,980</div>
+                      <div class='sub'>投入 8,271,000</div>
+                    </div>
+                  </div><div class='row' style='--i:1'>
+                    <div class='rank rank-2'>2</div>
+                    <div class='who'>
+                      <div class='name'>htcpm </div>
+                      <div class='sub'>19 注 · 勝率 74%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num gain'>+1,026,686</div>
+                      <div class='sub'>投入 3,830,000</div>
+                    </div>
+                  </div><div class='row' style='--i:2'>
+                    <div class='rank rank-3'>3</div>
+                    <div class='who'>
+                      <div class='name'>s5868775 </div>
+                      <div class='sub'>89 注 · 勝率 24%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num gain'>+970,493</div>
+                      <div class='sub'>投入 3,647,141</div>
+                    </div>
+                  </div><div class='row' style='--i:3'>
+                    <div class='rank rank-4'>4</div>
+                    <div class='who'>
+                      <div class='name'>nickmomopig </div>
+                      <div class='sub'>91 注 · 勝率 19%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num gain'>+854,999</div>
+                      <div class='sub'>投入 2,963,808</div>
+                    </div>
+                  </div><div class='row' style='--i:4'>
+                    <div class='rank rank-5'>5</div>
+                    <div class='who'>
+                      <div class='name'>777paimon </div>
+                      <div class='sub'>48 注 · 勝率 17%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num gain'>+743,132</div>
+                      <div class='sub'>投入 696,000</div>
+                    </div>
+                  </div><div class='row' style='--i:5'>
+                    <div class='rank rank-6'>6</div>
+                    <div class='who'>
+                      <div class='name'>rice088 </div>
+                      <div class='sub'>13 注 · 勝率 46%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num gain'>+343,057</div>
+                      <div class='sub'>投入 140,010</div>
+                    </div>
+                  </div><div class='row' style='--i:6'>
+                    <div class='rank rank-7'>7</div>
+                    <div class='who'>
+                      <div class='name'>yves0703 </div>
+                      <div class='sub'>6 注 · 勝率 83%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num gain'>+189,602</div>
+                      <div class='sub'>投入 657,000</div>
+                    </div>
+                  </div><div class='row' style='--i:7'>
+                    <div class='rank rank-8'>8</div>
+                    <div class='who'>
+                      <div class='name'>1cheng0209 </div>
+                      <div class='sub'>27 注 · 勝率 15%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num gain'>+168,845</div>
+                      <div class='sub'>投入 138,399</div>
+                    </div>
+                  </div><div class='row' style='--i:8'>
+                    <div class='rank rank-9'>9</div>
+                    <div class='who'>
+                      <div class='name'>12bbbbnini12 </div>
+                      <div class='sub'>1 注 · 勝率 100%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num gain'>+159,460</div>
+                      <div class='sub'>投入 10,000</div>
+                    </div>
+                  </div><div class='row' style='--i:9'>
+                    <div class='rank rank-10'>10</div>
+                    <div class='who'>
+                      <div class='name'>qaz858014 </div>
+                      <div class='sub'>17 注 · 勝率 35%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num gain'>+147,534</div>
+                      <div class='sub'>投入 969,000</div>
+                    </div>
+                  </div>
+    </div>
+    <div class="board loss">
+      <div class="board-head">
+        <div class="ico loss"><i class="fas fa-arrow-trend-down"></i></div>
+        <h2>虧損排行</h2><span class="count">TOP 10</span>
+      </div>
+      <div class='row is-champion' style='--i:0'>
+                    <div class='rank rank-1'>1</div>
+                    <div class='who'>
+                      <div class='name'>winniewinnie03 <i class='fas fa-skull champ-ico'></i></div>
+                      <div class='sub'>22 注 · 勝率 27%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num loss'>-859,900</div>
+                      <div class='sub'>投入 2,891,248</div>
+                    </div>
+                  </div><div class='row' style='--i:1'>
+                    <div class='rank rank-2'>2</div>
+                    <div class='who'>
+                      <div class='name'>hepinhan </div>
+                      <div class='sub'>7 注 · 勝率 0%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num loss'>-830,020</div>
+                      <div class='sub'>投入 830,020</div>
+                    </div>
+                  </div><div class='row' style='--i:2'>
+                    <div class='rank rank-3'>3</div>
+                    <div class='who'>
+                      <div class='name'>ahxu4ni_c </div>
+                      <div class='sub'>57 注 · 勝率 25%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num loss'>-718,648</div>
+                      <div class='sub'>投入 1,880,616</div>
+                    </div>
+                  </div><div class='row' style='--i:3'>
+                    <div class='rank rank-4'>4</div>
+                    <div class='who'>
+                      <div class='name'>permadoubt </div>
+                      <div class='sub'>51 注 · 勝率 57%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num loss'>-515,878</div>
+                      <div class='sub'>投入 2,770,411</div>
+                    </div>
+                  </div><div class='row' style='--i:4'>
+                    <div class='rank rank-5'>5</div>
+                    <div class='who'>
+                      <div class='name'>ahow6552 </div>
+                      <div class='sub'>10 注 · 勝率 30%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num loss'>-510,539</div>
+                      <div class='sub'>投入 1,570,000</div>
+                    </div>
+                  </div><div class='row' style='--i:5'>
+                    <div class='rank rank-6'>6</div>
+                    <div class='who'>
+                      <div class='name'>riunotry </div>
+                      <div class='sub'>3 注 · 勝率 0%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num loss'>-510,000</div>
+                      <div class='sub'>投入 510,000</div>
+                    </div>
+                  </div><div class='row' style='--i:6'>
+                    <div class='rank rank-7'>7</div>
+                    <div class='who'>
+                      <div class='name'>broadbill0619 </div>
+                      <div class='sub'>25 注 · 勝率 0%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num loss'>-341,000</div>
+                      <div class='sub'>投入 341,000</div>
+                    </div>
+                  </div><div class='row' style='--i:7'>
+                    <div class='rank rank-8'>8</div>
+                    <div class='who'>
+                      <div class='name'>jc07944 </div>
+                      <div class='sub'>36 注 · 勝率 25%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num loss'>-331,089</div>
+                      <div class='sub'>投入 1,166,337</div>
+                    </div>
+                  </div><div class='row' style='--i:8'>
+                    <div class='rank rank-9'>9</div>
+                    <div class='who'>
+                      <div class='name'>allen_0930 </div>
+                      <div class='sub'>17 注 · 勝率 71%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num loss'>-298,377</div>
+                      <div class='sub'>投入 791,476</div>
+                    </div>
+                  </div><div class='row' style='--i:9'>
+                    <div class='rank rank-10'>10</div>
+                    <div class='who'>
+                      <div class='name'>b112233556677 </div>
+                      <div class='sub'>28 注 · 勝率 32%</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num loss'>-291,194</div>
+                      <div class='sub'>投入 1,464,000</div>
+                    </div>
+                  </div>
+    </div>
+  </div>
+
+  <div class="boards">
+    <div class="board full">
+      <div class="board-head">
+        <div class="ico hot"><i class="fas fa-fire"></i></div>
+        <h2>熱門投注選項</h2><span class="count">TOP 10</span>
+      </div>
+      <div class='row is-champion' style='--i:0'>
+                    <div class='rank rank-1'>1</div>
+                    <div class='who'>
+                      <div class='name'>以外(X&lt;10或X&gt;12) <span class='medal medal-1'>冠軍</span></div>
+                      <div class='sub'>27 位玩家 · 投入 1,674,380</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num'>40 <span class='unit'>注</span></div>
+                      <div class='sub'>勝率 <span class='gain'>75%</span></div>
+                    </div>
+                  </div><div class='row' style='--i:1'>
+                    <div class='rank rank-2'>2</div>
+                    <div class='who'>
+                      <div class='name'>以外(X&lt;5或X&gt;13) <span class='medal medal-2'>亞軍</span></div>
+                      <div class='sub'>29 位玩家 · 投入 634,398</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num'>40 <span class='unit'>注</span></div>
+                      <div class='sub'>勝率 <span class='gain'>63%</span></div>
+                    </div>
+                  </div><div class='row' style='--i:2'>
+                    <div class='rank rank-3'>3</div>
+                    <div class='who'>
+                      <div class='name'>以內(5&lt;X&lt;13) <span class='medal medal-3'>季軍</span></div>
+                      <div class='sub'>27 位玩家 · 投入 1,530,819</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num'>36 <span class='unit'>注</span></div>
+                      <div class='sub'>勝率 <span class='loss'>39%</span></div>
+                    </div>
+                  </div><div class='row' style='--i:3'>
+                    <div class='rank rank-4'>4</div>
+                    <div class='who'>
+                      <div class='name'>以內(10&lt;X&lt;12) </div>
+                      <div class='sub'>20 位玩家 · 投入 127,687</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num'>33 <span class='unit'>注</span></div>
+                      <div class='sub'>勝率 <span class='loss'>0%</span></div>
+                    </div>
+                  </div><div class='row' style='--i:4'>
+                    <div class='rank rank-5'>5</div>
+                    <div class='who'>
+                      <div class='name'>以內(1&lt;X&lt;5) </div>
+                      <div class='sub'>24 位玩家 · 投入 673,577</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num'>29 <span class='unit'>注</span></div>
+                      <div class='sub'>勝率 <span class='loss'>34%</span></div>
+                    </div>
+                  </div><div class='row' style='--i:5'>
+                    <div class='rank rank-6'>6</div>
+                    <div class='who'>
+                      <div class='name'>以內(1&lt;X&lt;12) </div>
+                      <div class='sub'>25 位玩家 · 投入 1,049,011</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num'>28 <span class='unit'>注</span></div>
+                      <div class='sub'>勝率 <span class='gain'>100%</span></div>
+                    </div>
+                  </div><div class='row' style='--i:6'>
+                    <div class='rank rank-7'>7</div>
+                    <div class='who'>
+                      <div class='name'>以外(X&lt;10或X&gt;13) </div>
+                      <div class='sub'>23 位玩家 · 投入 1,784,218</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num'>28 <span class='unit'>注</span></div>
+                      <div class='sub'>勝率 <span class='gain'>100%</span></div>
+                    </div>
+                  </div><div class='row' style='--i:7'>
+                    <div class='rank rank-8'>8</div>
+                    <div class='who'>
+                      <div class='name'>以內(3&lt;X&lt;11) </div>
+                      <div class='sub'>22 位玩家 · 投入 1,771,607</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num'>27 <span class='unit'>注</span></div>
+                      <div class='sub'>勝率 <span class='gain'>96%</span></div>
+                    </div>
+                  </div><div class='row' style='--i:8'>
+                    <div class='rank rank-9'>9</div>
+                    <div class='who'>
+                      <div class='name'>以外(X&lt;7或X&gt;11) </div>
+                      <div class='sub'>19 位玩家 · 投入 1,926,756</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num'>27 <span class='unit'>注</span></div>
+                      <div class='sub'>勝率 <span class='gain'>56%</span></div>
+                    </div>
+                  </div><div class='row' style='--i:9'>
+                    <div class='rank rank-10'>10</div>
+                    <div class='who'>
+                      <div class='name'>以外(X&lt;1或X&gt;5) </div>
+                      <div class='sub'>23 位玩家 · 投入 2,236,906</div>
+                    </div>
+                    <div class='val'>
+                      <div class='num'>27 <span class='unit'>注</span></div>
+                      <div class='sub'>勝率 <span class='loss'>22%</span></div>
+                    </div>
+                  </div>
+    </div>
+  </div>
+
+  <footer>
+    資料更新於 2026/06/25 14:47:08 · 僅統計當日賭盤<br>
+    本頁由本地端自動產生並推送，無伺服器運算
+  </footer>
+
+</div>
+</body>
+</html>
