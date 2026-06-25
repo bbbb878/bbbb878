@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>逼寶當日預測排行榜 · 2026/06/25</title>
+<title>當日賭盤排行榜 · 2026/06/25</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -39,6 +39,10 @@ h1 .accent{color:var(--purple)}
 .datebox{text-align:right}
 .datebox .d{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.15rem}
 .datebox .u{font-size:.72rem;color:var(--muted);margin-top:2px}
+.nav{display:flex;gap:8px;margin-bottom:24px}
+.nav a{font-size:.82rem;font-weight:700;text-decoration:none;color:var(--muted);border:1px solid var(--line);padding:7px 14px;border-radius:999px;transition:.15s}
+.nav a:hover{color:var(--text);border-color:var(--purple)}
+.nav a.active{color:#1a1320;background:var(--purple);border-color:var(--purple)}
 
 /* 統計 chips */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px}
@@ -120,20 +124,25 @@ footer{margin-top:34px;text-align:center;color:var(--muted);font-size:.74rem;lin
 
   <div class="top">
     <div class="brand">
-      <div class="kicker"><span class="live"></span> Live · 每五分鐘重置 · 數據僅供參考</div>
-      <h1>逼寶當日預測<span class="accent"></span>排行榜</h1>
+      <div class="kicker"><span class="live"></span> Live · 每日重置</div>
+      <h1>當日<span class="accent">賭盤</span>排行榜</h1>
     </div>
     <div class="datebox">
       <div class="d">2026/06/25 <span style="color:var(--muted);font-weight:500">週四</span></div>
-      <div class="u">更新於 15:14:47</div>
+      <div class="u">更新於 15:22:40</div>
     </div>
   </div>
 
+  <div class="nav">
+    <a href="index.html" class="active">賭盤損益</a>
+    <a href="levels.html">等級排行</a>
+  </div>
+
   <div class="stats">
-    <div class="chip"><div class="l">參與用戶</div><div class="v">229</div></div>
-    <div class="chip"><div class="l">總下注次</div><div class="v">2,284</div></div>
+    <div class="chip"><div class="l">參與玩家</div><div class="v">229</div></div>
+    <div class="chip"><div class="l">總注單</div><div class="v">2,284</div></div>
     <div class="chip"><div class="l">總投入點數</div><div class="v">68,113,305</div></div>
-    <div class="chip"><div class="l">預測場次</div><div class="v">86</div></div>
+    <div class="chip"><div class="l">賭盤場次</div><div class="v">86</div></div>
   </div>
 
   <div class="hero">
@@ -381,7 +390,7 @@ footer{margin-top:34px;text-align:center;color:var(--muted);font-size:.74rem;lin
     <div class="board full">
       <div class="board-head">
         <div class="ico hot"><i class="fas fa-fire"></i></div>
-        <h2>熱門預測選項</h2><span class="count">TOP 10</span>
+        <h2>熱門投注選項</h2><span class="count">TOP 10</span>
       </div>
       <div class='row is-champion' style='--i:0'>
                     <div class='rank rank-1'>1</div>
@@ -488,7 +497,8 @@ footer{margin-top:34px;text-align:center;color:var(--muted);font-size:.74rem;lin
   </div>
 
   <footer>
-    資料更新於 2026/06/25 15:14:47 · 僅統計當日賭盤<br>
+    資料更新於 2026/06/25 15:22:40 · 僅統計當日賭盤<br>
+    本頁由本地端自動產生並推送，無伺服器運算
   </footer>
 
 </div>

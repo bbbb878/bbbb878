@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>等級排行榜 · 2026/06/25</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<style>:root{
+  --bg:#0c0a13; --panel:#141019; --raised:#1b1626; --line:#2a2438;
+  --purple:#a970ff; --purple-deep:#6c3ff0;
+  --mint:#2ce4b8; --coral:#ff5d73; --gold:#ffcb52;
+  --silver:#cdd2dc; --bronze:#d98f54;
+  --text:#efedf5; --muted:#8f8aa3;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"Noto Sans TC","Space Grotesk",system-ui,sans-serif;line-height:1.45;-webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(900px 420px at 50% -120px, rgba(108,63,240,.22), transparent 70%),
+    radial-gradient(600px 300px at 0 0, rgba(255,203,82,.05), transparent 70%);
+}
+.num{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 18px 60px}
+
+/* 頁首 + 切換 */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.brand{display:flex;flex-direction:column;gap:6px}
+.kicker{display:flex;align-items:center;gap:8px;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.live{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 0 rgba(255,203,82,.6);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,203,82,.5)}70%{box-shadow:0 0 0 7px rgba(255,203,82,0)}100%{box-shadow:0 0 0 0 rgba(255,203,82,0)}}
+h1{margin:0;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:2rem;letter-spacing:-.02em}
+h1 .accent{color:var(--gold)}
+.datebox{text-align:right}.datebox .d{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.15rem}.datebox .u{font-size:.72rem;color:var(--muted);margin-top:2px}
+.nav{display:flex;gap:8px;margin-bottom:24px}
+.nav a{font-size:.82rem;font-weight:700;text-decoration:none;color:var(--muted);border:1px solid var(--line);padding:7px 14px;border-radius:999px;transition:.15s}
+.nav a:hover{color:var(--text);border-color:var(--purple)}
+.nav a.active{color:#1a1320;background:var(--gold);border-color:var(--gold)}
+
+/* 統計 */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.chip .l{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.chip .v{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:1.5rem;margin-top:4px}
+
+/* 頒獎台 */
+.podium{display:flex;gap:14px;align-items:flex-end;justify-content:center;margin-bottom:28px}
+.pod{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px 16px;text-align:center;position:relative;overflow:hidden}
+.pod-2{order:1} .pod-1{order:2} .pod-3{order:3}
+.pod-1{border-color:rgba(255,203,82,.5);padding-top:30px;padding-bottom:30px;box-shadow:0 0 40px rgba(255,203,82,.12)}
+.pod-1::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 0,rgba(255,203,82,.16),transparent 60%);pointer-events:none}
+.pod-medal{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:.95rem;color:var(--muted);position:relative}
+.pod-1 .pod-medal{color:var(--gold)} .pod-2 .pod-medal{color:var(--silver)} .pod-3 .pod-medal{color:var(--bronze)}
+.av{width:58px;height:58px;border-radius:50%;margin:12px auto 10px;display:flex;align-items:center;justify-content:center;
+  font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.5rem;color:#1a1320;position:relative}
+.pod-1 .av{width:70px;height:70px;font-size:1.8rem;background:linear-gradient(135deg,#ffe08a,var(--gold))}
+.pod-2 .av{background:linear-gradient(135deg,#eef1f6,var(--silver))}
+.pod-3 .av{background:linear-gradient(135deg,#f0b483,var(--bronze))}
+.pod-name{font-weight:700;font-size:1.05rem;position:relative;word-break:break-all}
+.pod-lv{color:var(--purple);font-weight:800;font-size:1.05rem;margin-top:6px;position:relative}
+.pod-1 .pod-lv{font-size:1.25rem}
+.pod-pts{font-weight:800;font-size:1.1rem;margin-top:4px;position:relative}
+.pod-pts span{font-size:.7rem;color:var(--muted);font-weight:500}
+.pod-sub{font-size:.72rem;color:var(--muted);margin-top:8px;position:relative}
+.pod.is-empty{opacity:.5}.pod-empty{font-size:1.6rem;color:var(--muted);margin:20px 0}
+
+/* 名單 */
+.board{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.board-head{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.board-head .ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:rgba(169,112,255,.14);color:var(--purple)}
+.board-head h2{margin:0;font-family:"Space Grotesk",sans-serif;font-size:1.05rem;font-weight:700;flex:1}
+.board-head .count{font-family:"JetBrains Mono",monospace;font-size:.75rem;color:var(--muted)}
+.row{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid rgba(42,36,56,.6);
+  animation:rise .5s ease both;animation-delay:calc(var(--i,0)*40ms)}
+.row:last-child{border-bottom:none}.row:hover{background:var(--raised)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.rank{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:1.05rem;text-align:center;color:var(--muted)}
+.who .name{font-weight:700;font-size:.98rem;word-break:break-all}
+.who .sub{font-size:.72rem;color:var(--muted);margin-top:2px}
+.val{display:flex;align-items:center;gap:14px}
+.lv-badge{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:.78rem;color:var(--purple);background:rgba(169,112,255,.12);border:1px solid rgba(169,112,255,.25);padding:3px 10px;border-radius:999px;white-space:nowrap}
+.val .pts{font-weight:800;font-size:1.02rem;min-width:96px;text-align:right}
+.val .unit{font-size:.7rem;color:var(--muted);font-weight:500}
+.empty{padding:34px 20px;text-align:center;color:var(--muted);font-size:.9rem}
+footer{margin-top:34px;text-align:center;color:var(--muted);font-size:.74rem;line-height:1.7}
+
+@media (max-width:760px){
+  h1{font-size:1.55rem}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .podium{flex-direction:column;align-items:stretch}
+  .pod-1,.pod-2,.pod-3{order:0;padding:18px 16px}
+  .pod-1{box-shadow:none}
+  .val .pts{min-width:0}
+}
+@media (prefers-reduced-motion:reduce){.row{animation:none}.live{animation:none}}</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="kicker"><span class="live"></span> Live Ranking</div>
+      <h1>等級<span class="accent">排行榜</span></h1>
+    </div>
+    <div class="datebox">
+      <div class="d">2026/06/25</div>
+      <div class="u">更新於 15:22:40</div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <a href="index.html">賭盤損益</a>
+    <a href="levels.html" class="active">等級排行</a>
+  </div>
+
+  <div class="stats">
+    <div class="chip"><div class="l">總玩家</div><div class="v">197,116</div></div>
+    <div class="chip"><div class="l">最高等級</div><div class="v">1,000</div></div>
+    <div class="chip"><div class="l">總聊天訊息</div><div class="v">18,983,020</div></div>
+    <div class="chip"><div class="l">總觀看時數</div><div class="v">10,445,397</div></div>
+  </div>
+
+  <div class="podium">
+    <div class='pod pod-1'>
+              <div class='pod-medal'><i class='fas fa-crown'></i> 1</div>
+              <div class='av'>Y</div>
+              <div class='pod-name'>yoyo9559</div>
+              <div class='pod-lv num'>Lv.1000</div>
+              <div class='pod-pts num'>634,934,000 <span>pts</span></div>
+              <div class='pod-sub'>聊天 282,140 · 觀看 3,767h</div>
+            </div>
+    <div class='pod pod-2'>
+              <div class='pod-medal'> 2</div>
+              <div class='av'>5</div>
+              <div class='pod-name'>5m4__</div>
+              <div class='pod-lv num'>Lv.1000</div>
+              <div class='pod-pts num'>501,785,900 <span>pts</span></div>
+              <div class='pod-sub'>聊天 165,004 · 觀看 3,447h</div>
+            </div>
+    <div class='pod pod-3'>
+              <div class='pod-medal'> 3</div>
+              <div class='av'>A</div>
+              <div class='pod-name'>alone_eloh</div>
+              <div class='pod-lv num'>Lv.1000</div>
+              <div class='pod-pts num'>453,298,800 <span>pts</span></div>
+              <div class='pod-sub'>聊天 91,428 · 觀看 3,581h</div>
+            </div>
+  </div>
+
+  <div class="board">
+    <div class="board-head">
+      <div class="ico"><i class="fas fa-ranking-star"></i></div>
+      <h2>完整排行</h2><span class="count">TOP 50</span>
+    </div>
+    <div class='row' style='--i:0'>
+                    <div class='rank'>4</div>
+                    <div class='who'>
+                      <div class='name'>allen_0930</div>
+                      <div class='sub'>聊天 107,678 · 觀看 3,195 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.1000</span>
+                      <div class='num pts'>426,651,300 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:1'>
+                    <div class='rank'>5</div>
+                    <div class='who'>
+                      <div class='name'>senpaixd__97</div>
+                      <div class='sub'>聊天 83,074 · 觀看 3,008 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.1000</span>
+                      <div class='num pts'>386,102,900 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:2'>
+                    <div class='rank'>6</div>
+                    <div class='who'>
+                      <div class='name'>mrdestructoid00001</div>
+                      <div class='sub'>聊天 78,370 · 觀看 2,956 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.1000</span>
+                      <div class='num pts'>377,047,000 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:3'>
+                    <div class='rank'>7</div>
+                    <div class='who'>
+                      <div class='name'>lptong77</div>
+                      <div class='sub'>聊天 74,982 · 觀看 2,826 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.992</span>
+                      <div class='num pts'>360,062,200 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:4'>
+                    <div class='rank'>8</div>
+                    <div class='who'>
+                      <div class='name'>mizune__chair</div>
+                      <div class='sub'>聊天 71,412 · 觀看 3,416 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.985</span>
+                      <div class='num pts'>419,012,700 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:5'>
+                    <div class='rank'>9</div>
+                    <div class='who'>
+                      <div class='name'>qeq24qaa111</div>
+                      <div class='sub'>聊天 108,273 · 觀看 2,786 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.978</span>
+                      <div class='num pts'>384,194,550 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:6'>
+                    <div class='rank'>10</div>
+                    <div class='who'>
+                      <div class='name'>yeezy0528</div>
+                      <div class='sub'>聊天 67,558 · 觀看 2,830 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.934</span>
+                      <div class='num pts'>354,136,800 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:7'>
+                    <div class='rank'>11</div>
+                    <div class='who'>
+                      <div class='name'>0happy123</div>
+                      <div class='sub'>聊天 82,893 · 觀看 2,633 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.927</span>
+                      <div class='num pts'>347,011,550 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:8'>
+                    <div class='rank'>12</div>
+                    <div class='who'>
+                      <div class='name'>freddy_0825</div>
+                      <div class='sub'>聊天 66,182 · 觀看 3,766 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.915</span>
+                      <div class='num pts'>451,317,200 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:9'>
+                    <div class='rank'>13</div>
+                    <div class='who'>
+                      <div class='name'>vanitasqwq</div>
+                      <div class='sub'>聊天 71,580 · 觀看 2,587 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.912</span>
+                      <div class='num pts'>332,040,500 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:10'>
+                    <div class='rank'>14</div>
+                    <div class='who'>
+                      <div class='name'>ssa9175917</div>
+                      <div class='sub'>聊天 64,795 · 觀看 2,576 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.897</span>
+                      <div class='num pts'>325,590,750 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:11'>
+                    <div class='rank'>15</div>
+                    <div class='who'>
+                      <div class='name'>junlin0816</div>
+                      <div class='sub'>聊天 63,516 · 觀看 3,100 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.880</span>
+                      <div class='num pts'>379,103,600 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:12'>
+                    <div class='rank'>16</div>
+                    <div class='who'>
+                      <div class='name'>saw1287</div>
+                      <div class='sub'>聊天 199,580 · 觀看 2,474 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.874</span>
+                      <div class='num pts'>429,045,500 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:13'>
+                    <div class='rank'>17</div>
+                    <div class='who'>
+                      <div class='name'>pandadog</div>
+                      <div class='sub'>聊天 63,067 · 觀看 3,156 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.874</span>
+                      <div class='num pts'>384,549,450 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:14'>
+                    <div class='rank'>18</div>
+                    <div class='who'>
+                      <div class='name'>teacarryouo</div>
+                      <div class='sub'>聊天 62,993 · 觀看 3,690 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.873</span>
+                      <div class='num pts'>440,626,550 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:15'>
+                    <div class='rank'>19</div>
+                    <div class='who'>
+                      <div class='name'>minglee_xd</div>
+                      <div class='sub'>聊天 131,524 · 觀看 2,469 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.873</span>
+                      <div class='num pts'>370,655,400 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:16'>
+                    <div class='rank'>20</div>
+                    <div class='who'>
+                      <div class='name'>darkmoon9520</div>
+                      <div class='sub'>聊天 62,722 · 觀看 2,467 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.869</span>
+                      <div class='num pts'>311,998,700 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:17'>
+                    <div class='rank'>21</div>
+                    <div class='who'>
+                      <div class='name'>rice088</div>
+                      <div class='sub'>聊天 61,923 · 觀看 3,471 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.858</span>
+                      <div class='num pts'>416,739,550 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:18'>
+                    <div class='rank'>22</div>
+                    <div class='who'>
+                      <div class='name'>bbbb87dog1</div>
+                      <div class='sub'>聊天 93,353 · 觀看 2,411 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.853</span>
+                      <div class='num pts'>332,155,050 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:19'>
+                    <div class='rank'>23</div>
+                    <div class='who'>
+                      <div class='name'>q89675851</div>
+                      <div class='sub'>聊天 60,235 · 觀看 2,963 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.836</span>
+                      <div class='num pts'>361,912,250 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:20'>
+                    <div class='rank'>24</div>
+                    <div class='who'>
+                      <div class='name'>irohas41016</div>
+                      <div class='sub'>聊天 67,204 · 觀看 2,321 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.823</span>
+                      <div class='num pts'>300,390,900 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:21'>
+                    <div class='rank'>25</div>
+                    <div class='who'>
+                      <div class='name'>klasv3v</div>
+                      <div class='sub'>聊天 56,277 · 觀看 2,960 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.783</span>
+                      <div class='num pts'>358,285,450 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:22'>
+                    <div class='rank'>26</div>
+                    <div class='who'>
+                      <div class='name'>yenxxzzzn</div>
+                      <div class='sub'>聊天 259,142 · 觀看 2,197 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.782</span>
+                      <div class='num pts'>450,535,700 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:23'>
+                    <div class='rank'>27</div>
+                    <div class='who'>
+                      <div class='name'>shaoyi0105</div>
+                      <div class='sub'>聊天 55,805 · 觀看 2,167 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.772</span>
+                      <div class='num pts'>275,004,250 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:24'>
+                    <div class='rank'>28</div>
+                    <div class='who'>
+                      <div class='name'>bernieyo</div>
+                      <div class='sub'>聊天 55,786 · 觀看 2,160 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.770</span>
+                      <div class='num pts'>273,815,600 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:25'>
+                    <div class='rank'>29</div>
+                    <div class='who'>
+                      <div class='name'>kai___0109</div>
+                      <div class='sub'>聊天 55,080 · 觀看 3,294 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.767</span>
+                      <div class='num pts'>392,285,500 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:26'>
+                    <div class='rank'>30</div>
+                    <div class='who'>
+                      <div class='name'>capookawaii</div>
+                      <div class='sub'>聊天 52,955 · 觀看 3,059 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.739</span>
+                      <div class='num pts'>365,839,250 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:27'>
+                    <div class='rank'>31</div>
+                    <div class='who'>
+                      <div class='name'>rexyz2z</div>
+                      <div class='sub'>聊天 52,647 · 觀看 3,093 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.735</span>
+                      <div class='num pts'>369,112,450 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:28'>
+                    <div class='rank'>32</div>
+                    <div class='who'>
+                      <div class='name'>n1nj4h99</div>
+                      <div class='sub'>聊天 68,482 · 觀看 2,044 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.731</span>
+                      <div class='num pts'>272,479,700 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:29'>
+                    <div class='rank'>33</div>
+                    <div class='who'>
+                      <div class='name'>doiya247</div>
+                      <div class='sub'>聊天 51,576 · 觀看 3,613 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.721</span>
+                      <div class='num pts'>422,784,600 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:30'>
+                    <div class='rank'>34</div>
+                    <div class='who'>
+                      <div class='name'>37170355</div>
+                      <div class='sub'>聊天 50,987 · 觀看 2,291 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.713</span>
+                      <div class='num pts'>283,526,450 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:31'>
+                    <div class='rank'>35</div>
+                    <div class='who'>
+                      <div class='name'>s1nnnnnnn12</div>
+                      <div class='sub'>聊天 53,852 · 觀看 1,964 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.704</span>
+                      <div class='num pts'>252,081,700 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:32'>
+                    <div class='rank'>36</div>
+                    <div class='who'>
+                      <div class='name'>error0069</div>
+                      <div class='sub'>聊天 70,341 · 觀看 1,879 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.676</span>
+                      <div class='num pts'>256,682,350 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:33'>
+                    <div class='rank'>37</div>
+                    <div class='who'>
+                      <div class='name'>kapiobhee</div>
+                      <div class='sub'>聊天 47,855 · 觀看 3,219 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.671</span>
+                      <div class='num pts'>378,234,250 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:34'>
+                    <div class='rank'>38</div>
+                    <div class='who'>
+                      <div class='name'>afterglow_himari_</div>
+                      <div class='sub'>聊天 71,374 · 觀看 1,172 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.667</span>
+                      <div class='num pts'>183,377,900 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:35'>
+                    <div class='rank'>39</div>
+                    <div class='who'>
+                      <div class='name'>weisheng2000</div>
+                      <div class='sub'>聊天 66,008 · 觀看 1,151 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.667</span>
+                      <div class='num pts'>177,014,300 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:36'>
+                    <div class='rank'>40</div>
+                    <div class='who'>
+                      <div class='name'>7701219413</div>
+                      <div class='sub'>聊天 47,358 · 觀看 3,407 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.664</span>
+                      <div class='num pts'>397,621,800 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:37'>
+                    <div class='rank'>41</div>
+                    <div class='who'>
+                      <div class='name'>my_first_jar_of_pickles</div>
+                      <div class='sub'>聊天 50,510 · 觀看 1,837 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.662</span>
+                      <div class='num pts'>235,853,500 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:38'>
+                    <div class='rank'>42</div>
+                    <div class='who'>
+                      <div class='name'>aobaismywife0810</div>
+                      <div class='sub'>聊天 64,011 · 觀看 1,756 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.635</span>
+                      <div class='num pts'>238,859,350 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:39'>
+                    <div class='rank'>43</div>
+                    <div class='who'>
+                      <div class='name'>xiu323</div>
+                      <div class='sub'>聊天 56,518 · 觀看 1,733 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.627</span>
+                      <div class='num pts'>230,005,300 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:40'>
+                    <div class='rank'>44</div>
+                    <div class='who'>
+                      <div class='name'>x_d_d__</div>
+                      <div class='sub'>聊天 45,012 · 觀看 1,717 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.622</span>
+                      <div class='num pts'>218,142,700 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:41'>
+                    <div class='rank'>45</div>
+                    <div class='who'>
+                      <div class='name'>yuannnn999</div>
+                      <div class='sub'>聊天 73,138 · 觀看 1,656 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.602</span>
+                      <div class='num pts'>236,047,300 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:42'>
+                    <div class='rank'>46</div>
+                    <div class='who'>
+                      <div class='name'>000x00087</div>
+                      <div class='sub'>聊天 19,427 · 觀看 3,774 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.600</span>
+                      <div class='num pts'>412,345,450 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:43'>
+                    <div class='rank'>47</div>
+                    <div class='who'>
+                      <div class='name'>blove487</div>
+                      <div class='sub'>聊天 42,219 · 觀看 1,602 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.584</span>
+                      <div class='num pts'>203,693,650 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:44'>
+                    <div class='rank'>48</div>
+                    <div class='who'>
+                      <div class='name'>nrfreddy</div>
+                      <div class='sub'>聊天 40,862 · 觀看 2,091 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.578</span>
+                      <div class='num pts'>253,850,200 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:45'>
+                    <div class='rank'>49</div>
+                    <div class='who'>
+                      <div class='name'>bubu25560945</div>
+                      <div class='sub'>聊天 40,009 · 觀看 3,025 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.566</span>
+                      <div class='num pts'>351,265,150 <span class='unit'>pts</span></div>
+                    </div>
+                  </div><div class='row' style='--i:46'>
+                    <div class='rank'>50</div>
+                    <div class='who'>
+                      <div class='name'>ninu487</div>
+                      <div class='sub'>聊天 38,979 · 觀看 3,063 小時</div>
+                    </div>
+                    <div class='val'>
+                      <span class='lv-badge'>Lv.553</span>
+                      <div class='num pts'>354,344,650 <span class='unit'>pts</span></div>
+                    </div>
+                  </div>
+  </div>
+
+  <footer>
+    依等級、積分排序 · 更新於 2026/06/25 15:22:40<br>
+    本頁由本地端自動產生並推送，無伺服器運算
+  </footer>
+
+</div>
+</body>
+</html>
